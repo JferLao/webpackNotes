@@ -1,0 +1,19 @@
+{
+    "name": "webpack",
+    "version": "1.0.0",
+    "description": "**webpack的核心是模块打包工具,用来翻译引入和导出js文件**",
+    "main": "index.js",
+    "scripts": {
+        "bundle": "webpack"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/JferLao/webpackNotes.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/JferLao/webpackNotes/issues"
+    },
+    "homepage": "https://github.com/JferLao/webpackNotes#readme"
+}

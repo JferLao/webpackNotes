@@ -5,7 +5,7 @@
 ### module(模块)
 > 模块化编程,把程序分解为功能离散的chunk,称之为模块,使得每个模块具有比完整程序更小的接触面,使得验证、调试轻而易举。
 
-##### webpack模块
+#### webpack模块
 + 区别于Node.js的模块,webpack模块是基于Node.js的经验而来,能够以各种方法来控制模块之间的依赖关系
 + 例子
 
@@ -20,7 +20,7 @@
 + loader描述了webpack如何处理非JavaScript 模块，并且在 bundle中引入这些依赖
 
 
-##### webpack模块变量
+#### webpack模块变量
 变量名|解释|所属
 ---|:--:|--
 module.loaded|表示该模块执行状态|NodeJS
@@ -40,3 +40,23 @@ __ webpack_modules__|访问所有模块的内部对象|webpack 特有变量
 __ webpack_hash__|这个变量提供对编译过程中(compilation)的 hash 信息的获取|webpack 特有变量
 __non_webpack_require __|生成一个不会被 webpack 解析的 require 函数|webpack 特有变量
 DEBUG|等同于配置选项中的 debug|webpack 特有变量
+
+
+### webpack运行的三种方式
+1. webpack index.js
+2. npx webpack index.js
+3. npm run bundle
+
+### webpack配置
++ webpack默认有一套默认的配置,每个工程不同需要不同的配置文件,可以通过自己写(webpack.config.js)进行配置
+1. 一般默认为webpack.config.js,也可以在终端使用指令npx webpack --config 配置文件名.js进行打包
+2. webpack-cli实现webpack在命令行终端的实现
+
+### package.json配置
+1. 可以通过在package.json中script设置命令打包替代npx webpack
+```     
+<!-- 通过npm run bundle就可以执行打包 -->
+"scripts": {
+    "bundle":"webpack"
+}
+```
