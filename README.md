@@ -60,3 +60,13 @@ DEBUG|等同于配置选项中的 debug|webpack 特有变量
     "bundle":"webpack"
 }
 ```
+
+### webpack打包出来的内容
+1. Hash:代表此次打包生成的唯一的hash值
+2. Version:代表此次打包的webpack版本
+3. Time:代表此次打包的花费时间
+4. Built at:代表此次打包的时间
+5. Asset ->文件名
+6. Size ->文件大小
+7. Chunks ->打包时文件的id值和其他js文件的id值
+8. Chunk Names -> 打包时的文件名字
