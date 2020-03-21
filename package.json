@@ -15,5 +15,8 @@
     "bugs": {
         "url": "https://github.com/JferLao/webpackNotes/issues"
     },
-    "homepage": "https://github.com/JferLao/webpackNotes#readme"
+    "homepage": "https://github.com/JferLao/webpackNotes#readme",
+    "dependencies": {
+        "file-loader": "^6.0.0"
+    }
 }
