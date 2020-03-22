@@ -150,3 +150,56 @@ module.exports = {
   },
 }
 ```
+
+### loader打包样式资源
+1. 打包样式资源需要多个loader(style-loader/css-loader),use为数组
+2. style-loader主要是将css-loader处理过的css文件挂载到head的style中
+3. 对其他样式文件(sass/less)需要对应的loader
+4. loader的执行从队尾开始执行
+5. 使用postcss-loader来处理浏览器厂商前缀的处理,postcss-loader需要autoprefix插件和进行配置
+```
+<!-- postcss.config.js -->
+module.exports = {
+    plugins: [
+        require('autoprefixer')     //插件
+    ]
+}
+```
+6. 如果要使用@import引入样式,需要在options内进行配置
+7. 引入图标文字
+
+### 样式loader代码示例
+```
+{
+                test: /\.css$/, //匹配规则
+                use: ['style-loader', {
+                            loader: 'css-loader',
+                            options: {
+                                importLoaders: 1, //通过import引入的文件都会依次执行下面的一个loader
+                                modules: true, //开启样式模块化
+                            }
+                        },
+                        'postcss-loader'
+                    ] //需要css-loader和挂载css的loader
+            },
+            {
+                test: /\.less$/, //匹配规则
+                use: ['style-loader', {
+                        loader: 'css-loader',
+                        options: {
+                            importLoaders: 2, //通过import引入的文件都会依次执行下面的两个loader
+                            modules: true, //开启样式模块化
+                        }
+                    }, 'less-loader', 'postcss-loader'] //需要两个loader
+            },
+            {
+                test: /\.sass$/, //匹配规则
+                use: ['style-loader', {
+                        loader: 'css-loader',
+                        options: {
+                            importLoaders: 2, //通过import引入的文件都会依次执行下面的两个loader
+                            modules: true, //开启样式模块化
+                        }
+                    }, 'sass-loader', 'postcss-loader'] //需要两个loader
+            },
+```

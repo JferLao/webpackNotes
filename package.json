@@ -1,24 +1,32 @@
 {
-    "name": "webpack",
-    "version": "1.0.0",
-    "description": "**webpack的核心是模块打包工具,用来翻译引入和导出js文件**",
-    "main": "index.js",
-    "scripts": {
-        "bundle": "webpack"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/JferLao/webpackNotes.git"
-    },
-    "author": "",
-    "license": "ISC",
-    "bugs": {
-        "url": "https://github.com/JferLao/webpackNotes/issues"
-    },
-    "homepage": "https://github.com/JferLao/webpackNotes#readme",
-    "dependencies": {},
-    "devDependencies": {
-        "file-loader": "^6.0.0",
-        "url-loader": "^4.0.0"
-    }
+  "name": "webpack",
+  "version": "1.0.0",
+  "description": "**webpack的核心是模块打包工具,用来翻译引入和导出js文件**",
+  "main": "index.js",
+  "scripts": {
+    "bundle": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JferLao/webpackNotes.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JferLao/webpackNotes/issues"
+  },
+  "homepage": "https://github.com/JferLao/webpackNotes#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "autoprefixer": "^9.7.4",
+    "css-loader": "^3.4.2",
+    "file-loader": "^6.0.0",
+    "less-loader": "^5.0.0",
+    "node-sass": "^4.13.1",
+    "postcss-loader": "^3.0.0",
+    "sass-loader": "^8.0.2",
+    "style-loader": "^1.1.3",
+    "url-loader": "^4.0.0",
+    "webpack": "^4.42.0"
+  }
 }

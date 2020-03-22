@@ -31,7 +31,39 @@ module.exports = {
                         limit: 204800, //图片小于200kb都会直接打包到bundle.js中,大于200kb会打包到images内
                     }
                 }
-            }
+            },
+            {
+                test: /\.css$/, //匹配规则
+                use: ['style-loader', {
+                            loader: 'css-loader',
+                            options: {
+                                importLoaders: 1, //通过import引入的文件都会依次执行下面的一个loader
+                                modules: true, //开启样式模块化
+                            }
+                        },
+                        'postcss-loader'
+                    ] //需要css-loader和挂载css的loader
+            },
+            {
+                test: /\.less$/, //匹配规则
+                use: ['style-loader', {
+                        loader: 'css-loader',
+                        options: {
+                            importLoaders: 2, //通过import引入的文件都会依次执行下面的两个loader
+                            modules: true, //开启样式模块化
+                        }
+                    }, 'less-loader', 'postcss-loader'] //需要两个loader
+            },
+            {
+                test: /\.sass$/, //匹配规则
+                use: ['style-loader', {
+                        loader: 'css-loader',
+                        options: {
+                            importLoaders: 2, //通过import引入的文件都会依次执行下面的两个loader
+                            modules: true, //开启样式模块化
+                        }
+                    }, 'sass-loader', 'postcss-loader'] //需要两个loader
+            },
         ]
     },
     output: { //出口文件
