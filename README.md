@@ -78,3 +78,75 @@ DEBUG|等同于配置选项中的 debug|webpack 特有变量
 3. webpack配置里设置了相关内容的打包方式
 4. 当处理到相关文件时,首先会将文件移动到dist文件夹下,之后会得到一个相对于dist目录的文件名称
 5. 相关结果处理完可以通过在入口文件及依赖得到相关变量
+
+
+### loader打包图片资源
+1. file-loader可以配置将图片资源按规则打包到dist文件中
+2. url-loader可以配置将图片资源直接转化为Base64然后打包到bundle.js中
+3. 最佳实践,通过设置图片大小的限制,将小图片打包到bundle.js以减少http请求,大图片则打包到images文件夹内以减小http请求文件的大小
+
+### file-loader
+1. 代码示例
+```
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.(png|jpg|gif)$/,       //正则匹配的文件格式
+        use: [
+          {
+            loader: 'file-loader',     //使用file-loader
+            options: {                 //选项
+                name:'[path][name].[ext]',  //用到占位符,默认[hash].[ext]为hash+后缀名,name也可以为function
+                outputPath: 'images/', //将图片打包到资源文件夹images中,outputPath也可以为function
+                publicPath: 'assets',   //指定目标文件的定制公共路径,也可以为function
+                context: 'project',     //指定自定义文件上下文。
+                regExp:/\/([a-z0-9]+)\/[a-z0-9]+\.png$/,    //为目标文件路径的一个或多个部分指定一个正则表达式 
+            },
+          },
+        ],
+      },
+    ],
+  },
+}
+```
+2. 占位符placehoders
+    1. [ext] 文件后缀名
+    2. [name]文件原来的名字
+    3. [path]资源相对于webpack / config上下文的路径
+    4. [folder]资源所在的文件夹
+    5. [emoji]内容的随机表情符号表示
+    6. [hash]指定生成文件内容哈希值的哈希方法
+
+
+### url-loader
+1. 代码示例
+```
+<!-- url-loader和file-loader很类似 -->
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.(png|jpg|gif)$/,       //正则匹配的文件格式
+        use: [
+          {
+            loader: 'file-loader',     //使用file-loader
+            options: {                 //选项
+            <!-- 相同 -->
+                name:'[path][name].[ext]',  //用到占位符,默认[hash].[ext]为hash+后缀名,name也可以为function
+                outputPath: 'images/', //将图片打包到资源文件夹images中,outputPath也可以为function
+                publicPath: 'assets',   //指定目标文件的定制公共路径,也可以为function
+                context: 'project',     //指定自定义文件上下文。
+                regExp:/\/([a-z0-9]+)\/[a-z0-9]+\.png$/,    //为目标文件路径的一个或多个部分指定一个正则表达式 
+            <!-- 不同 -->
+                limit: 204800, //图片小于200kb都会直接打包到bundle.js中,大于200kb会打包到images内
+                fallback:'responsive-loader',   //指定当目标文件的大小超过limit选项中设置的限制时使用的备用加载程序
+                mimetype: 'image/png', //设置要转换文件的MIME类型。 如果未指定，则文件扩展名将用于查找MIME类型
+            },
+          },
+        ],
+      },
+    ],
+  },
+}
+```
