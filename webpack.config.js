@@ -64,6 +64,12 @@ module.exports = {
                         }
                     }, 'sass-loader', 'postcss-loader'] //需要两个loader
             },
+            { //图标字体文件
+                test: /\.(eot|ttf|svg)$/, //文字格式处理
+                use: { //使用的loader
+                    loader: 'file-loader',
+                }
+            },
         ]
     },
     output: { //出口文件

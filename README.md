@@ -166,7 +166,6 @@ module.exports = {
 }
 ```
 6. 如果要使用@import引入样式,需要在options内进行配置
-7. 引入图标文字
 
 ### 样式loader代码示例
 ```
@@ -202,4 +201,21 @@ module.exports = {
                         }
                     }, 'sass-loader', 'postcss-loader'] //需要两个loader
             },
+```
+
+### 图标字体的引入
+```
+
+module.exports = {
+  module: {
+    rules: [
+      { //图标字体文件
+    test: /\.(eot|ttf|svg)$/, //文字格式处理
+    use: { //使用的loader
+      loader: 'file-loader',
+        }
+      },
+    ],
+  },
+}
 ```
