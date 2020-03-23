@@ -219,3 +219,27 @@ module.exports = {
   },
 }
 ```
+
+
+### 使用plugins打包
+1. 使用HtmlWebpackPlugin打包结束后自动生成一个index.html文件,并把打包生成的js文件自动引入到这个html文件中
+```
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+var path = require('path');
+
+module.exports = {
+  entry: 'index.js',
+  output: {
+    path: path.resolve(__dirname, './dist'),
+    filename: 'index_bundle.js'
+  },
+  plugins: [new HtmlWebpackPlugin({
+    template:'src/index.html'   //以index.html为模板生成
+  })]
+};
+```
+2. plugin可以在webpack运行到某个阶段自动帮你完成某个任务.类似Vue等生命周期
+3. 使用clean-webpack-plugin自动清除dist文件
+```
+new CleanWebpackPlugin()  //不用传参,自动清除output配置项里的路径就是dist目录
+```

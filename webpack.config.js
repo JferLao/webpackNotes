@@ -1,6 +1,6 @@
 const path = require('path') //引入node的核心模块path
-
-
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 module.exports = {
     mode: 'production', //打包模式可以为生产模式production和开发模式development 
     entry: {
@@ -38,32 +38,32 @@ module.exports = {
                             loader: 'css-loader',
                             options: {
                                 importLoaders: 1, //通过import引入的文件都会依次执行下面的一个loader
-                                modules: true, //开启样式模块化
+                                // modules: true, //开启样式模块化
                             }
                         },
                         'postcss-loader'
                     ] //需要css-loader和挂载css的loader
             },
-            {
-                test: /\.less$/, //匹配规则
-                use: ['style-loader', {
-                        loader: 'css-loader',
-                        options: {
-                            importLoaders: 2, //通过import引入的文件都会依次执行下面的两个loader
-                            modules: true, //开启样式模块化
-                        }
-                    }, 'less-loader', 'postcss-loader'] //需要两个loader
-            },
-            {
-                test: /\.sass$/, //匹配规则
-                use: ['style-loader', {
-                        loader: 'css-loader',
-                        options: {
-                            importLoaders: 2, //通过import引入的文件都会依次执行下面的两个loader
-                            modules: true, //开启样式模块化
-                        }
-                    }, 'sass-loader', 'postcss-loader'] //需要两个loader
-            },
+            // {
+            //     test: /\.less$/, //匹配规则
+            //     use: ['style-loader', {
+            //             loader: 'css-loader',
+            //             options: {
+            //                 importLoaders: 2, //通过import引入的文件都会依次执行下面的两个loader
+            //                 // modules: true, //开启样式模块化
+            //             }
+            //         }, 'less-loader', 'postcss-loader'] //需要两个loader
+            // },
+            // {
+            //     test: /\.sass$/, //匹配规则
+            //     use: ['style-loader', {
+            //             loader: 'css-loader',
+            //             options: {
+            //                 importLoaders: 2, //通过import引入的文件都会依次执行下面的两个loader
+            //                 // modules: true, //开启样式模块化
+            //             }
+            //         }, 'sass-loader', 'postcss-loader'] //需要两个loader
+            // },
             { //图标字体文件
                 test: /\.(eot|ttf|svg)$/, //文字格式处理
                 use: { //使用的loader
@@ -72,6 +72,13 @@ module.exports = {
             },
         ]
     },
+    // 使用插件
+    plugins: [
+        new HtmlWebpackPlugin({
+            template: 'src/index.html'
+        }),
+        new CleanWebpackPlugin(),
+    ],
     output: { //出口文件
         filename: 'bundle.js', //打包后的文件名
         path: path.resolve(__dirname, 'dist') //__dirname是当前webpack.config.js文件的目录路径,与bundle结合最后打包在bundle文件夹中
