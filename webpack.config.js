@@ -1,11 +1,24 @@
 const path = require('path') //引入node的核心模块path
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const webpack = require('webpack')
+
 module.exports = {
     mode: 'production', //打包模式可以为生产模式production和开发模式development 
     entry: {
         main: './src/index.js', //入口文件
     },
+    devServer: {
+        contentBase: './dist', //服务器根路径所在位置
+        open: true, //自动打开浏览器并打开localhost:8080 
+        proxy: { //使用跨域代理
+            '/api': 'http://localhost:3000'
+        },
+        port: 8080, //端口
+        hot: true, //开启热模块更新
+        hotOnly: true, //不让浏览器自动刷新
+    },
+    devtool: 'cheap-module-eval-source-map', //处理代码的映射关系
     module: {
         //打包规则
         rules: [
@@ -78,6 +91,7 @@ module.exports = {
             template: 'src/index.html'
         }),
         new CleanWebpackPlugin(),
+        new webpack.HotModuleReplacementPlugin()
     ],
     output: { //出口文件
         filename: 'bundle.js', //打包后的文件名

@@ -243,3 +243,61 @@ module.exports = {
 ```
 new CleanWebpackPlugin()  //不用传参,自动清除output配置项里的路径就是dist目录
 ```
+
+### Entry和output的配置
+1. publicPath用来处理引入的Js文件中加入CDN地址前缀等等
+
+
+### SourceMap处理代码出错
+1. sourceMap,是一个映射关系,知道dist目录下的main.js文件中出错的代码对应打包前代码出错对应的位置,dist也会生成一个新的文件来控制映射
+2. 使用devtool:'source-map'就可以实现
+3. 最佳实践:在development开发环境中使用cheap-module-eval-source-map,production线上环境使用cheap-module-source-map
+
+
+### webpackDevServer
+1. 第一种服务器监听文件的方法,使用webpack的watch方法监听打包后的文件自动刷新
+```
+<!-- 在package.json文件中设置脚本 -->
+"scripts": {
+    "watch": "webpack --watch"
+  },
+```
+2. 第二种方法用webpackDevServer来开启一个服务器,可以发送http请求,可以在代码发生改变时浏览器内容自动刷新.这时候打包后的dist文件会放置在内存中以提高打包效率
+```
+module.exports={
+  devServer: {
+        contentBase: './dist', //服务器根路径所在位置
+        open:true,              //自动打开浏览器并打开localhost:8080   
+    }
+}
+<!-- package.json -->
+"scripts": {
+      "start": "webpack-dev-server"
+  }
+```
+3. 第三种方法使用Node环境搭建服务器(基于KOA或者Express等框架)
+
+### webpack 热模块更新
+1. 使用方法:
+```
+const webpack = require('webpack') 
+module.exports={
+  devServer: {
+    hot: true, //开启热模块更新
+    hotOnly: true, //不让浏览器自动刷新
+  },
+  plugins: [new webpack.HotModuleReplacementPlugin()] //使用webpack的热模块插件
+}
+```
+2. 使用热模块更新,可以实现文件更改时不自动刷新,而是根据模块变化进行模块的更新,特别当如css发生变化时,当前的页面dom不更新但是更新的css样式可以更新查看
+3. 如果使用热模块更新js文件,想要代码部分发生改变/模块发生改变
+```
+if(module.hot){
+  module.hot.accept('./模块',()=>{
+    <!-- 重新执行的代码 -->
+  })
+}
+
+```
+4. css发生变化时,css-loader的底层已经处理过HMR效果,所以不用写.
+5. 本质上要实现HMR效果都要写这种代码,不过部分框架底层已经写了这部分代码所以不用写.
