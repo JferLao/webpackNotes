@@ -18,9 +18,14 @@
     "url": "https://github.com/JferLao/webpackNotes/issues"
   },
   "homepage": "https://github.com/JferLao/webpackNotes#readme",
-  "dependencies": {},
+  "dependencies": {
+    "@babel/polyfill": "^7.8.7"
+  },
   "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.0",
     "autoprefixer": "^9.7.4",
+    "babel-loader": "^8.1.0",
     "clean-webpack-plugin": "^3.0.0",
     "css-loader": "^3.4.2",
     "file-loader": "^6.0.0",

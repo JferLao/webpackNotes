@@ -301,3 +301,47 @@ if(module.hot){
 ```
 4. css发生变化时,css-loader的底层已经处理过HMR效果,所以不用写.
 5. 本质上要实现HMR效果都要写这种代码,不过部分框架底层已经写了这部分代码所以不用写.
+
+
+### 使用Babel处理ES6+语法
+1. 安装
+```
+npm install --save-dev babel-loader @babel/core
+npm install @babel/preset-env --save-dev  //所有翻译规则
+```
+2. 配置
+```
+module: {
+  rules: [
+    // 使用babel处理ES6代码
+            {
+                test: /\.js$/,
+                exclude: /node_modules/, //排除node_modules,因为第三方依赖一般已经处理,没必要再处理一次
+                loader: "babel-loader",
+                options:{
+                    "presets": ["@babel/preset-env"]
+                }
+            }
+  ]
+}
+```
+3. 低版本的浏览器对翻译后的语法依然不识别,就需要@babel/polyfill
+```
+npm install --save @babel/polyfill
+import "@babel/polyfill";       //处理ES6代码低版本浏览器不兼容
+```
+4. 引入@babel/polyfill导致打包后的文件变大,可以通过在babel/preset-env中添加参数控制用到什么语法才翻译
+```
+{
+                test: /\.js$/,
+                exclude: /node_modules/, //排除node_modules,因为第三方依赖一般已经处理,没必要再处理一次
+                loader: "babel-loader",
+                options: {
+                    "presets": [
+                        ["@babel/preset-env", {
+                            useBuiltIns: 'usage' //对使用的es6语法才翻译
+                        }]
+                    ]
+                }
+            }
+```

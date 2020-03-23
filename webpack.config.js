@@ -83,6 +83,22 @@ module.exports = {
                     loader: 'file-loader',
                 }
             },
+            // 使用babel处理ES6代码
+            {
+                test: /\.js$/,
+                exclude: /node_modules/, //排除node_modules,因为第三方依赖一般已经处理,没必要再处理一次
+                loader: "babel-loader",
+                options: {
+                    "presets": [
+                        ["@babel/preset-env", {
+                            targets: {
+                                chrome: "67" //对chrome67以上版本忽略打包
+                            },
+                            useBuiltIns: 'usage' //对使用的es6语法才翻译
+                        }]
+                    ]
+                }
+            }
         ]
     },
     // 使用插件
