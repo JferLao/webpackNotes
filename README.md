@@ -345,3 +345,38 @@ import "@babel/polyfill";       //处理ES6代码低版本浏览器不兼容
                 }
             }
 ```
+5. 也可以把babel抽离出单独文件.babelrc使得全局都可以使用ES6代码
+```
+{
+    "presets": ["@babel/preset-env"]
+}
+```
+
+
+### tree shaking
+1. tree shaking 是一个术语，通常用于描述移除 JavaScript 上下文中的未引用代码(dead-code)。它依赖于 ES2015 模块语法的 静态结构 特性，例如 import 和 export。
+2. 通过 package.json 的 "sideEffects" 属性，来实现将文件标记为 side-effect-free(无副作用) ,如果所有代码都不包含 side effect，我们就可以简单地将该属性标记为 false，来告知 webpack，它可以安全地删除未用到的 export
+```
+<!-- 不想操作的文件可以使用数组记录 -->
+{
+  "name": "your-project",
+  "sideEffects": [
+    "./src/some-side-effectful-file.js"
+    "*.css"
+  ]
+}
+```
+3. 在webpack.config.js使用Tree Shaking,Tree Shaking在开发环境使用后打包会导入所有模块,但是会只使用用到的模块,在线上环境则会只导入使用的模块
+```
+<!-- 在开发环境中 -->
+module.exports = {
+  mode: 'development',
+  optimization: {
+  usedExports: true
+  }
+};
+<!-- 在线上环境中 -->
+module.exports = {
+  mode: 'production'
+};
+```
