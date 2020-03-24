@@ -170,37 +170,36 @@ module.exports = {
 ### 样式loader代码示例
 ```
 {
-                test: /\.css$/, //匹配规则
-                use: ['style-loader', {
-                            loader: 'css-loader',
-                            options: {
-                                importLoaders: 1, //通过import引入的文件都会依次执行下面的一个loader
-                                modules: true, //开启样式模块化
-                            }
-                        },
-                        'postcss-loader'
-                    ] //需要css-loader和挂载css的loader
-            },
-            {
-                test: /\.less$/, //匹配规则
-                use: ['style-loader', {
-                        loader: 'css-loader',
-                        options: {
-                            importLoaders: 2, //通过import引入的文件都会依次执行下面的两个loader
-                            modules: true, //开启样式模块化
-                        }
-                    }, 'less-loader', 'postcss-loader'] //需要两个loader
-            },
-            {
-                test: /\.sass$/, //匹配规则
-                use: ['style-loader', {
-                        loader: 'css-loader',
-                        options: {
-                            importLoaders: 2, //通过import引入的文件都会依次执行下面的两个loader
-                            modules: true, //开启样式模块化
-                        }
-                    }, 'sass-loader', 'postcss-loader'] //需要两个loader
-            },
+    test: /\.css$/, //匹配规则
+    use: ['style-loader', {
+      loader: 'css-loader',
+      options: {
+          importLoaders: 1, //通过import引入的文件都会依次执行下面的一个loader
+          modules: true, //开启样式模块化
+      }
+    },
+      'postcss-loader'] //需要css-loader和挂载css的loader
+},
+{
+    test: /\.less$/, //匹配规则
+    use: ['style-loader', {
+            loader: 'css-loader',
+            options: {
+                importLoaders: 2, //通过import引入的文件都会依次执行下面的两个loader
+                modules: true, //开启样式模块化
+            }
+        }, 'less-loader', 'postcss-loader'] //需要两个loader
+},
+{
+    test: /\.sass$/, //匹配规则
+    use: ['style-loader', {
+            loader: 'css-loader',
+            options: {
+                importLoaders: 2, //通过import引入的文件都会依次执行下面的两个loader
+                modules: true, //开启样式模块化
+            }
+        }, 'sass-loader', 'postcss-loader'] //需要两个loader
+},
 ```
 
 ### 图标字体的引入
@@ -266,8 +265,8 @@ new CleanWebpackPlugin()  //不用传参,自动清除output配置项里的路径
 ```
 module.exports={
   devServer: {
-        contentBase: './dist', //服务器根路径所在位置
-        open:true,              //自动打开浏览器并打开localhost:8080   
+      contentBase: './dist', //服务器根路径所在位置
+      open:true,              //自动打开浏览器并打开localhost:8080   
     }
 }
 <!-- package.json -->
@@ -314,14 +313,14 @@ npm install @babel/preset-env --save-dev  //所有翻译规则
 module: {
   rules: [
     // 使用babel处理ES6代码
-            {
-                test: /\.js$/,
-                exclude: /node_modules/, //排除node_modules,因为第三方依赖一般已经处理,没必要再处理一次
-                loader: "babel-loader",
-                options:{
-                    "presets": ["@babel/preset-env"]
-                }
-            }
+      {
+          test: /\.js$/,
+          exclude: /node_modules/, //排除node_modules,因为第三方依赖一般已经处理,没必要再处理一次
+          loader: "babel-loader",
+          options:{
+              "presets": ["@babel/preset-env"]
+          }
+      }
   ]
 }
 ```
@@ -333,17 +332,17 @@ import "@babel/polyfill";       //处理ES6代码低版本浏览器不兼容
 4. 引入@babel/polyfill导致打包后的文件变大,可以通过在babel/preset-env中添加参数控制用到什么语法才翻译
 ```
 {
-                test: /\.js$/,
-                exclude: /node_modules/, //排除node_modules,因为第三方依赖一般已经处理,没必要再处理一次
-                loader: "babel-loader",
-                options: {
-                    "presets": [
-                        ["@babel/preset-env", {
-                            useBuiltIns: 'usage' //对使用的es6语法才翻译
-                        }]
-                    ]
-                }
-            }
+    test: /\.js$/,
+    exclude: /node_modules/, //排除node_modules,因为第三方依赖一般已经处理,没必要再处理一次
+    loader: "babel-loader",
+    options: {
+        "presets": [
+            ["@babel/preset-env", {
+                useBuiltIns: 'usage' //对使用的es6语法才翻译
+            }]
+        ]
+    }
+}
 ```
 5. 也可以把babel抽离出单独文件.babelrc使得全局都可以使用ES6代码
 ```
@@ -378,5 +377,73 @@ module.exports = {
 <!-- 在线上环境中 -->
 module.exports = {
   mode: 'production'
+};
+```
+
+### Develoment和Production模式的区分打包
+1. 因为Development环境下的配置和Production环境下的配置不同,可以分成两个文件,webpack.dev.js和webpack.prod.js,并且在package,json配置两个打包方式.
+```
+"scripts": {
+  "dev": "webpack-dev-server --config webpack.dev.js",
+  "build": "webpack --config webpack.prod.js"
+},
+```
+2. 为解决代码重复,可以创建一个公共的webpack.common.js文件来放置共同的代码
+3. 使用webpack-merge来将公共代码和环境代码合并
+```
+    const merge = require('webpack-merge')
+    const commonConfig = require('./webpack.common')
+    const prodConfig = {
+      mode: 'production', //打包模式可以为生产模式production和开发模式development 
+      devtool: 'cheap-module-source-map', //处理代码的映射关系
+      // 使用插件
+    }
+    module.exports = merge(commonConfig, prodConfig)
+```
+
+### Code Splitting
+1. 可以将库的代码用新开一个页面,把属性和方法保存在window全局对象上,与业务代码区分开.
+2. 将代码拆分多个文件,然后在入口文件处输入多个文件
+3. webpack有很多Code Splitting的插件可以使用,可以减少手动的操作
+4. 分割代码的两种方式:
+  + 同步代码:只要在webpack.common.js中做optimization的配置即可
+  ```
+  optimization: {
+        splitChunks: {
+            chunk: 'all' //使用splitChunks进行代码分隔
+        }
+    },
+  ```
+  + 异步代码(import):异步代码,无需任何配置,会自动进行代码分割
+5. 使用插件@babel/plugin-syntax-dynamic-import可以实现magicComments
+
+### SplitChunksPlugin 
+```
+module.exports = {
+  optimization: {
+        splitChunks: {
+            chunks: 'async', //代码只对异步代码生效,可以配置all然后根据cacheGroups配置判断是否对同步代码和异步代码分割,initial为同步代码
+            minSize: 30000, //引入的模块/包大于3000个字节(30kb)才做代码分割
+            // maxSize: 50000, //引入的模块/包大于个50000字节会将代码再分割成另外一个新的模块
+            minChunks: 1, //引入的模块使用次数小于1则不作代码分割
+            maxAsyncRequests: 5, //超过异步的模块/库超过5个则不会执行代码分割
+            maxInitialRequests: 3, //超过同步的模块/库超过3个则不会执行代码分割
+            automaticNameDelimiter: '~',
+            name: true,
+            cacheGroups: { //缓存组,符合上面代码分割的规则就会缓存到这里,把符合下面规则的代码打包在一起
+                vendors: {
+                    test: /[\\/]node_modules[\\/]/, //检测是否在node_modules文件夹内,符合的话会将代码分割到vendor~入口文件名字组
+                    priority: -10, //打包优先级,越高优先打包在这
+                    fillname: 'vendors.js' //把文件名改成vendors.js
+                },
+                default: { //默认放置的组名
+                    minChunks: 2,
+                    priority: -20,
+                    reuseExistingChunk: true, //复用已经打包过的模块
+                    fillname: 'common.js'
+                }
+            }
+        }
+    }
 };
 ```

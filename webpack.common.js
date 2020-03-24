@@ -1,24 +1,11 @@
 const path = require('path') //引入node的核心模块path
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const webpack = require('webpack')
 
 module.exports = {
-    mode: 'production', //打包模式可以为生产模式production和开发模式development 
     entry: {
         main: './src/index.js', //入口文件
     },
-    devServer: {
-        contentBase: './dist', //服务器根路径所在位置
-        open: true, //自动打开浏览器并打开localhost:8080 
-        proxy: { //使用跨域代理
-            '/api': 'http://localhost:3000'
-        },
-        port: 8080, //端口
-        hot: true, //开启热模块更新
-        hotOnly: true, //不让浏览器自动刷新
-    },
-    devtool: 'cheap-module-eval-source-map', //处理代码的映射关系
     module: {
         //打包规则
         rules: [
@@ -101,16 +88,37 @@ module.exports = {
             }
         ]
     },
-    // 使用插件
     plugins: [
         new HtmlWebpackPlugin({
             template: 'src/index.html'
         }),
         new CleanWebpackPlugin(),
-        new webpack.HotModuleReplacementPlugin()
+
     ],
     optimization: {
-        usedExports: true //使用Tree Shaking
+        splitChunks: {
+            chunks: 'async', //代码只对异步代码生效,可以配置all然后根据cacheGroups配置判断是否对同步代码和异步代码分割,initial为同步代码
+            minSize: 30000, //引入的模块/包大于3000个字节(30kb)才做代码分割
+            // maxSize: 50000, //引入的模块/包大于个50000字节会将代码再分割成另外一个新的模块
+            minChunks: 1, //引入的模块使用次数小于1则不作代码分割
+            maxAsyncRequests: 5, //超过异步的模块/库超过5个则不会执行代码分割
+            maxInitialRequests: 3, //超过同步的模块/库超过3个则不会执行代码分割
+            automaticNameDelimiter: '~',
+            name: true,
+            cacheGroups: { //缓存组,符合上面代码分割的规则就会缓存到这里,把符合下面规则的代码打包在一起
+                vendors: {
+                    test: /[\\/]node_modules[\\/]/, //检测是否在node_modules文件夹内,符合的话会将代码分割到vendor~入口文件名字组
+                    priority: -10, //打包优先级,越高优先打包在这
+                    fillname: 'vendors.js' //把文件名改成vendors.js
+                },
+                default: { //默认放置的组名
+                    minChunks: 2,
+                    priority: -20,
+                    reuseExistingChunk: true, //复用已经打包过的模块
+                    fillname: 'common.js'
+                }
+            }
+        }
     },
     output: { //出口文件
         filename: 'bundle.js', //打包后的文件名
