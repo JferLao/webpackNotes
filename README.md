@@ -253,7 +253,7 @@ new CleanWebpackPlugin()  //不用传参,自动清除output配置项里的路径
 3. 最佳实践:在development开发环境中使用cheap-module-eval-source-map,production线上环境使用cheap-module-source-map
 
 
-### webpackDevServer
+### webpack DevServer
 1. 第一种服务器监听文件的方法,使用webpack的watch方法监听打包后的文件自动刷新
 ```
 <!-- 在package.json文件中设置脚本 -->
@@ -265,14 +265,34 @@ new CleanWebpackPlugin()  //不用传参,自动清除output配置项里的路径
 ```
 module.exports={
   devServer: {
-      contentBase: './dist', //服务器根路径所在位置
-      open:true,              //自动打开浏览器并打开localhost:8080   
-    }
+      contentBase: './dist', //告诉服务器从哪个目录中提供内容
+      open: true, //自动打开浏览器并打开localhost:8080 
+      proxy: { //使用跨域代理
+          '/api': 'http://localhost:3000'
+      },
+      port: 8080, //端口
+      hot: true, //开启热模块更新
+      hotOnly: true, //不让浏览器自动刷新
+      // before: function(app, server) {
+      //     //在服务内部的所有其他中间件之前， 提供执行自定义中间件的功能
+      //     app.get('/some/path', function(req, res) {
+      //       res.json({ custom: 'response' });
+      //     });
+      //   }
+      // after: function(app, server) {
+      //     // 在服务内部的所有其他中间件之后， 提供执行自定义中间件的功能
+      // },
+      //allowedHosts:['host.com'] //选项允许你添加白名单服务，允许一些开发服务器访问
+      headers: {},     //在所有响应中添加首部内容：
+      host: '127.0.0.1',  //指定使用一个 host。默认是 localhost
+      https: false,   //默认情况下，dev-server 通过 HTTP 提供服务,也可以选择带有 HTTPS 的 HTTP/2 提供服务
+      //index: 'index.html',   //被作为索引文件的文件名
+      lazy: false, //当启用 devServer.lazy 时，dev-server 只有在请求时才编译包(bundle)。这意味着 webpack 不会监视任何文件改动
+      // openPage: '/different/page'  //指定打开浏览器时的导航页面
+      // publicPath: '/assets/'       //此路径下的打包文件可在浏览器中访问,默认 devServer.publicPath 是 '/
+      // useLocalIp: false    //允许浏览器使用本地 IP 打开
+    },
 }
-<!-- package.json -->
-"scripts": {
-      "start": "webpack-dev-server"
-  }
 ```
 3. 第三种方法使用Node环境搭建服务器(基于KOA或者Express等框架)
 
@@ -300,6 +320,38 @@ if(module.hot){
 ```
 4. css发生变化时,css-loader的底层已经处理过HMR效果,所以不用写.
 5. 本质上要实现HMR效果都要写这种代码,不过部分框架底层已经写了这部分代码所以不用写.
+6. 热模块替换它的接口将被暴露在 module.hot 属性下面
+```
+if (module.hot) {
+    module.hot.accept( //接受(accept)给定依赖模块(dependencies)的更新，并触发一个 回调函数 来对这些更新做出响应
+        dependencies,// 依赖模块(dependencies)可以是一个字符串或字符串数组
+        callback // callback用于在模块更新后触发的函数
+    )
+    module.hot.decline( //拒绝给定依赖模块的更新，使用 'decline' 方法强制更新失败
+        dependencies // 可以是一个字符串或字符串数组
+    );
+    module.hot.dispose(data => {    //添加一个处理函数，在当前模块代码被替换时执行
+        // 清理并将 data 传递到更新后的模块……
+    });
+    module.hot.removeDisposeHandler(callback);
+    module.hot.status(); //取得模块热替换进程的当前状态。
+    module.hot.check(autoApply).then(outdatedModules => {//测试所有加载的模块以进行更新，如果有更新，则应用它们
+        // 超时的模块……
+    }).catch(error => {
+        // 捕获错误
+    });
+    module.hot.apply(options).then(outdatedModules => { //继续更新进程（只要 module.hot.status() === 'ready'）
+    // 超时的模块……
+    }).catch(error => {
+    // 捕获错误
+    });
+
+    module.hot.addStatusHandler(status => { //注册一个函数来监听 status的变化。
+        // 响应当前状态……
+    });
+    module.hot.removeStatusHandler(callback);//移除一个注册的状态处理函数。
+  }
+```
 
 
 ### 使用Babel处理ES6+语法
@@ -422,27 +474,27 @@ module.exports = {
 module.exports = {
   optimization: {
         splitChunks: {
-            chunks: 'async', //代码只对异步代码生效,可以配置all然后根据cacheGroups配置判断是否对同步代码和异步代码分割,initial为同步代码
-            minSize: 30000, //引入的模块/包大于3000个字节(30kb)才做代码分割
-            // maxSize: 50000, //引入的模块/包大于个50000字节会将代码再分割成另外一个新的模块
-            minChunks: 1, //引入的模块使用次数小于1则不作代码分割
-            maxAsyncRequests: 5, //超过异步的模块/库超过5个则不会执行代码分割
-            maxInitialRequests: 3, //超过同步的模块/库超过3个则不会执行代码分割
-            automaticNameDelimiter: '~',
-            name: true,
-            cacheGroups: { //缓存组,符合上面代码分割的规则就会缓存到这里,把符合下面规则的代码打包在一起
-                vendors: {
-                    test: /[\\/]node_modules[\\/]/, //检测是否在node_modules文件夹内,符合的话会将代码分割到vendor~入口文件名字组
-                    priority: -10, //打包优先级,越高优先打包在这
-                    fillname: 'vendors.js' //把文件名改成vendors.js
-                },
-                default: { //默认放置的组名
-                    minChunks: 2,
-                    priority: -20,
-                    reuseExistingChunk: true, //复用已经打包过的模块
-                    fillname: 'common.js'
-                }
-            }
+          chunks: 'async', //代码只对异步代码生效,可以配置all然后根据cacheGroups配置判断是否对同步代码和异步代码分割,initial为同步代码
+          minSize: 30000, //引入的模块/包大于3000个字节(30kb)才做代码分割
+          // maxSize: 50000, //引入的模块/包大于个50000字节会将代码再分割成另外一个新的模块
+          minChunks: 1, //引入的模块使用次数小于1则不作代码分割
+          maxAsyncRequests: 5, //超过异步的模块/库超过5个则不会执行代码分割
+          maxInitialRequests: 3, //超过同步的模块/库超过3个则不会执行代码分割
+          automaticNameDelimiter: '~',
+          name: true,
+          cacheGroups: { //缓存组,符合上面代码分割的规则就会缓存到这里,把符合下面规则的代码打包在一起
+              vendors: {
+                  test: /[\\/]node_modules[\\/]/, //检测是否在node_modules文件夹内,符合的话会将代码分割到vendor~入口文件名字组
+                  priority: -10, //打包优先级,越高优先打包在这
+                  fillname: 'vendors.js' //把文件名改成vendors.js
+              },
+              default: { //默认放置的组名
+                  minChunks: 2,
+                  priority: -20,
+                  reuseExistingChunk: true, //复用已经打包过的模块
+                  fillname: 'common.js'
+              }
+          }
         }
     }
 };
