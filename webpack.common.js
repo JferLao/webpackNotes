@@ -32,38 +32,6 @@ module.exports = {
                     }
                 }
             },
-            {
-                test: /\.css$/, //匹配规则
-                use: ['style-loader', {
-                            loader: 'css-loader',
-                            options: {
-                                importLoaders: 1, //通过import引入的文件都会依次执行下面的一个loader
-                                // modules: true, //开启样式模块化
-                            }
-                        },
-                        'postcss-loader'
-                    ] //需要css-loader和挂载css的loader
-            },
-            // {
-            //     test: /\.less$/, //匹配规则
-            //     use: ['style-loader', {
-            //             loader: 'css-loader',
-            //             options: {
-            //                 importLoaders: 2, //通过import引入的文件都会依次执行下面的两个loader
-            //                 // modules: true, //开启样式模块化
-            //             }
-            //         }, 'less-loader', 'postcss-loader'] //需要两个loader
-            // },
-            // {
-            //     test: /\.sass$/, //匹配规则
-            //     use: ['style-loader', {
-            //             loader: 'css-loader',
-            //             options: {
-            //                 importLoaders: 2, //通过import引入的文件都会依次执行下面的两个loader
-            //                 // modules: true, //开启样式模块化
-            //             }
-            //         }, 'sass-loader', 'postcss-loader'] //需要两个loader
-            // },
             { //图标字体文件
                 test: /\.(eot|ttf|svg)$/, //文字格式处理
                 use: { //使用的loader
@@ -96,6 +64,7 @@ module.exports = {
 
     ],
     optimization: {
+        usedExports: true, //使用Tree Shaking
         splitChunks: {
             chunks: 'async', //代码只对异步代码生效,可以配置all然后根据cacheGroups配置判断是否对同步代码和异步代码分割,initial为同步代码
             minSize: 30000, //引入的模块/包大于3000个字节(30kb)才做代码分割

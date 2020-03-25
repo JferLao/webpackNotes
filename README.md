@@ -499,3 +499,113 @@ module.exports = {
     }
 };
 ```
+
+
+### Lazy Loading懒加载
+1. 通过import异步加载模块,使用的时候才加载
+2. 懒加载或者按需加载，是一种很好的优化网页或应用的方式。这种方式实际上是先把你的代码在一些逻辑断点处分离开，然后在一些代码块中完成某些操作后，立即引用或即将引用另外一些新的代码块。这样加快了应用的初始加载速度，减轻了它的总体体积，因为某些代码块可能永远不会被加载
+3. 许多框架和类库对于如何用它们自己的方式来实现（懒加载）
+
+### 代码分离
+**常用的代码分离方法**
+1. 入口起点:使用entry配置手动地分离代码
+  1. 代码
+  ```
+  entry: {
+    index: './src/index.js',
+    another: './src/another-module.js'
+  },
+  ```
+  2. 隐患:如果入口 chunk 之间包含一些重复的模块，那些重复模块都会被引入到各个 bundle 中,这种方法不够灵活，并且不能动态地将核心应用程序逻辑中的代码拆分出来
+2. 防止重复:使用SplitChunksPlugin去重和分离chunk
+  1. SplitChunksPlugin 插件可以将公共的依赖模块提取到已有的 entry chunk 中，或者提取到一个新生成的 chunk。
+3. 动态导入:通过模块中的内联函数调用来分离代码
+  1. 使用符合 ECMAScript 提案 的 import() 语法 来实现动态导入
+  2. webpack 的遗留功能，使用 webpack 特定的 require.ensure。
+
+**预取/预加载模块**
+在声明 import 时，使用下面这些内置指令，可以让 webpack 输出 "resource hint(资源提示)"，来告知浏览器：
++ prefetch(预取)：将来某些导航下可能需要的资源
++ preload(预加载)：当前导航下可能需要资源
+```
+import(/* webpackPrefetch: true */ 'LoginModal');
+import(/* webpackPreload: true */ 'ChartingLibrary');
+```
+  + preload chunk 会在父 chunk 加载时，以并行方式开始加载。prefetch chunk 会在父 chunk 加载结束后开始加载
+  + preload chunk 具有中等优先级，并立即下载。prefetch chunk 在浏览器闲置时下载
+  + preload chunk 会在父 chunk 中立即请求，用于当下时刻。prefetch chunk 会用于未来的某个时刻
+  + 浏览器支持程度不同。
+
+**bundle 分析工具**
+1. webpack-chart：webpack stats 可交互饼图
+2. webpack-visualizer：可视化并分析你的 bundle，检查哪些模块占用空间，哪些可能是重复使用的
+3. webpack-bundle-analyzer：一个 plugin 和 CLI 工具，它将 bundle 内容展示为便捷的、交互式、可缩放的树状图形式。
+4. webpack bundle optimize helper：此工具会分析你的 bundle，并为你提供可操作的改进措施建议，以减少 bundle 体积大小。
+
+
+### CSS文件的代码分割
+1. 使用MiniCssExtractPlugin对CSS代码进行分割,一般在上线环境时打包才会使用,因为无法不支持WHR所以开发环境下一般不使用
+```
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+module.exports = {
+  plugins: [
+    new MiniCssExtractPlugin({
+      // Options similar to the same options in webpackOptions.output
+      // both options are optional
+      filename: "[name].css",
+      chunkFilename: "[id].css"
+    })
+  ],
+  module: {
+    rules: [
+      {
+        test: /\.css$/,
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              // you can specify a publicPath here
+              // by default it use publicPath in webpackOptions.output
+              publicPath: '../'
+            }
+          },
+          "css-loader"
+        ]
+      }
+    ]
+  }
+}
+```
+
+### 使用optimize-css-assets-webpack-plugin进行代码压缩
+```
+const TerserJSPlugin = require("terser-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+module.exports = {
+  optimization: {
+    minimizer: [
+      new TerserJSPlugin({}),
+      new OptimizeCSSAssetsPlugin({})   //压缩css代码
+    ]
+  },
+  plugins: [
+    new MiniCssExtractPlugin({
+      filename: "[name].css",
+      chunkFilename: "[id].css"
+    })
+  ],
+  module: {
+    rules: [
+      {
+        test: /\.css$/,
+        use: [
+          MiniCssExtractPlugin.loader,
+          "css-loader"
+        ]
+      }
+    ]
+  }
+}
+```
+

@@ -32,15 +32,53 @@ const devConfig = {
         // publicPath: '/assets/'       //此路径下的打包文件可在浏览器中访问,默认 devServer.publicPath 是 '/
         // useLocalIp: false    //允许浏览器使用本地 IP 打开
     },
+    module: {
+        //打包规则
+        rules: [
+
+            {
+                test: /\.css$/, //匹配规则
+                use: ['style-loader', {
+                            loader: 'css-loader',
+                            options: {
+                                importLoaders: 1, //通过import引入的文件都会依次执行下面的一个loader
+                                // modules: true, //开启样式模块化
+                            }
+                        },
+                        'postcss-loader'
+                    ] //需要css-loader和挂载css的loader
+            },
+            // {
+            //     test: /\.less$/, //匹配规则
+            //     use: ['style-loader', {
+            //             loader: 'css-loader',
+            //             options: {
+            //                 importLoaders: 2, //通过import引入的文件都会依次执行下面的两个loader
+            //                 // modules: true, //开启样式模块化
+            //             }
+            //         }, 'less-loader', 'postcss-loader'] //需要两个loader
+            // },
+            // {
+            //     test: /\.sass$/, //匹配规则
+            //     use: ['style-loader', {
+            //             loader: 'css-loader',
+            //             options: {
+            //                 importLoaders: 2, //通过import引入的文件都会依次执行下面的两个loader
+            //                 // modules: true, //开启样式模块化
+            //             }
+            //         }, 'sass-loader', 'postcss-loader'] //需要两个loader
+            // },
+        ]
+    },
     devtool: 'cheap-module-eval-source-map', //处理代码的映射关系
 
     // 使用插件
     plugins: [
         new webpack.HotModuleReplacementPlugin()
     ],
-    optimization: {
-        usedExports: true //使用Tree Shaking
-    }
+    // optimization: {
+    //     usedExports: true //使用Tree Shaking
+    // }
 }
 
 module.exports = merge(commonConfig, devConfig)
