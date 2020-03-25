@@ -30,6 +30,10 @@ const prodConfig = {
                 "css-loader"
             ]
         }]
+    },
+    output: { //利用contenthash使得改变代码时打包文件的结果都不相同,不改变时结果都相同
+        filename: '[name].[contenthash].js',
+        chunkFilename: '[name].[contenthash].js'
     }
 }
 module.exports = merge(commonConfig, prodConfig)

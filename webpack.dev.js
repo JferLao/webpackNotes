@@ -78,7 +78,11 @@ const devConfig = {
     ],
     // optimization: {
     //     usedExports: true //使用Tree Shaking
-    // }
+    // },
+    output: { //出口文件
+        filename: 'bundle.js', //打包后的文件名
+        path: path.resolve(__dirname, 'dist') //__dirname是当前webpack.config.js文件的目录路径,与bundle结合最后打包在bundle文件夹中
+    }
 }
 
 module.exports = merge(commonConfig, devConfig)

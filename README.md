@@ -609,3 +609,107 @@ module.exports = {
 }
 ```
 
+### 缓存
+1. webpack 提供了一种使用称为 substitution(可替换模板字符串) 的方式，通过带括号字符串来模板化文件名。其中，[contenthash] substitution 将根据资源内容创建出唯一 hash。当资源内容发生变化时，[contenthash] 也会发生变化
+```
+output: { //利用contenthash使得改变代码时打包文件的结果都不相同,不改变时结果都相同
+    filename: '[name].[contenthash].js',
+    chunkFilename: '[name].[contenthash].js'
+}
+```
+
+### shim 预置依赖
+1. 来实现polyfill 扩展浏览器能力，来支持到更多用户时
+2. 低版本的浏览器不支持一些语法和第三方方法,使用垫片,来使得全局支持,比如使用$就是使用jquery
+```
+  const webpack = require('webpack');
+  module.exports = {
+   plugins: [
+     new webpack.ProvidePlugin({
+       $: 'jquery'  //只有使用jquery时才在模块引入jquery
+     })
+   ]
+  };
+```
+
+
+### imports-loader
+1. 默认情况下this指向当前模块,如果想要改变this指向window,可以借助imports-loader模块
+```
+module.exports = {
+    ...
+    module: {
+        rules: [
+            {
+                test: require.resolve("some-module"),
+                use: "imports-loader?this=>window"
+            }
+        ]
+    }
+};
+```
+
+### 环境变量
+1. 一般的module.exports 指向配置对象,实际module.exports可以写成函数
+2. 可以根据webpack cli的配置来判断env环境变量
+```
+module.exports = env => {
+  console.log('NODE_ENV: ', env.NODE_ENV); // 'local'
+  console.log('Production: ', env.production); // true
+  return {
+    entry: './src/index.js',
+    output: {
+      filename: 'bundle.js',
+      path: path.resolve(__dirname, 'dist')
+    }
+  };
+};
+```
+
+### webpack Cli命令行
+1. 常用配置 
+2. 环境选项
+3. 配置选项 
+4. 输出配置 
+5. Debug 配置
+6. 模块配置
+7. Watch 选项 
+8. 性能优化配置
+9. Resolve 配置
+10. 统计数据配置
+11. 高级配置 
+12. Profiling
+
+webpack常用命令行
+代码|结果
+---|---:
+webpack --json|以 JSON 格式输出 webpack 的运行结果
+webpack --help|列出命令行所有可用的配置选项
+webpack --env.production|设置 env.production == true
+webpack --env.prod=1|{ prod: 1 }
+webpack --config|配置文件的路径
+webpack --config-name|要使用的配置名称
+webpack --config-register, -r|在 webpack 配置文件加载前先预加载一个或多个模块
+webpack --env|当配置文件是一个函数时，会将环境变量传给这个函数
+webpack --mode|用到的模式，"development" 或 "production" 之中的一个
+webpack --output-filename|打包文件的文件名
+webpack --output-library|以库的形式导出入口文件
+webpack --output-public-path|输出文件时使用的公共路径
+webpack --output-path|输出的路径（在公共路径的基础上）
+webpack --debug|把 loader 设置为 debug 模式
+webpack --devtool|为打包好的资源定义 [source map 的类型]
+webpack --progress|打印出编译进度的百分比值
+webpack --watch, -w|观察文件系统的变化
+webpack --optimize-max-chunks|限制 chunk 的数量
+webpack --resolve-alias|指定模块的别名
+
+**一般打包代码**
+```
+ "scripts": {
+    "bundle": "webpack",
+    "watch": "webpack --watch",
+    "start": "webpack --config webpack.dev.js",
+    "dev": "webpack-dev-server --config webpack.dev.js",
+    "build": "webpack --config webpack.prod.js"
+  }
+```

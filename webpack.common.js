@@ -1,6 +1,7 @@
 const path = require('path') //引入node的核心模块path
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
     entry: {
@@ -42,17 +43,21 @@ module.exports = {
             {
                 test: /\.js$/,
                 exclude: /node_modules/, //排除node_modules,因为第三方依赖一般已经处理,没必要再处理一次
-                loader: "babel-loader",
-                // options: {
-                //     "presets": [
-                //         ["@babel/preset-env", {
-                //             targets: {
-                //                 chrome: "67" //对chrome67以上版本忽略打包
-                //             },
-                //             useBuiltIns: 'usage' //对使用的es6语法才翻译
-                //         }]
-                //     ]
-                // }
+                use: [{
+                        loader: "babel-loader",
+                    }, {
+                        loader: "imports-loader?this=>window" //改变this指向
+                    }]
+                    // options: {
+                    //     "presets": [
+                    //         ["@babel/preset-env", {
+                    //             targets: {
+                    //                 chrome: "67" //对chrome67以上版本忽略打包
+                    //             },
+                    //             useBuiltIns: 'usage' //对使用的es6语法才翻译
+                    //         }]
+                    //     ]
+                    // }
             }
         ]
     },
@@ -61,7 +66,9 @@ module.exports = {
             template: 'src/index.html'
         }),
         new CleanWebpackPlugin(),
-
+        new webpack.ProvidePlugin({
+            // $: 'jquery'      //底层完成当页面使用了某个库,webpack检测到这个库时自动引入这个库
+        })
     ],
     optimization: {
         usedExports: true, //使用Tree Shaking
@@ -89,8 +96,5 @@ module.exports = {
             }
         }
     },
-    output: { //出口文件
-        filename: 'bundle.js', //打包后的文件名
-        path: path.resolve(__dirname, 'dist') //__dirname是当前webpack.config.js文件的目录路径,与bundle结合最后打包在bundle文件夹中
-    }
+
 }
