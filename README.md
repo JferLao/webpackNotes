@@ -761,3 +761,86 @@ const path = require('path');
     }
   };
 ```
+
+### typeScript配置打包
+1. 安装需要的插件
+> npm install --save-dev typescript ts-loader
+2. tsconfig.json的配置,用来支持jsx
+```
+{
+    "compilerOptions": {
+      "outDir": "./dist/",    //出口地
+      "noImplicitAny": true,   
+      "module": "es6",        //用的是ES Module的代码形式
+      "target": "es5",        //代码打包最终转化成的形式
+      "jsx": "react",         
+      "allowJs": true         //允许TS引入js模块
+    }
+  }
+```
+3. webpack配置
+```
+const path = require('path');
+
+module.exports = {
+  entry: './src/index.ts',
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/
+      }
+    ]
+  },
+  resolve: {
+    extensions: [ '.tsx', '.ts', '.js' ]
+  },
+  output: {
+    filename: 'bundle.js',
+    path: path.resolve(__dirname, 'dist')
+  }
+};
+```
+
+
+### 使用webpack DevServe实现请求转发
+1. 在开发环境下可以实现,在线上无法实现,
+```
+devServer: {
+		proxy: {
+			'/react/api': {
+				target: '代理服务器地址',
+				secure: false,    //实现https请求转发
+				pathRewrite: {    //间接改变请求文件
+					'header.json': 'demo.json'
+				},
+				changeOrigin: true, //突破Origin的限制
+				headers: {
+					host: '请求头',     //自己改变请求头
+          cookie:''           //cookie内容
+				}
+			}
+		}
+	},
+
+```
+
+### 使用webpack DevServe解决单页面路由
+1. 当使用 HTML5 History API 时，任意的 404 响应都可能需要被替代为 index.html
+2. 通过传入一个对象，比如使用 rewrites 这个选项，此行为可进一步地控制
+```
+module.exports = {
+  //...
+  devServer: {
+    historyApiFallback: true
+    rewrites: [     //替代historyApiFallback来进行独立的处理
+        { 
+          from: /abc.html/,
+          to: '/index.html' 
+        } 
+      ]
+  }
+};
+
+```
