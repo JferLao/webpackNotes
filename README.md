@@ -713,3 +713,51 @@ webpack --resolve-alias|指定模块的别名
     "build": "webpack --config webpack.prod.js"
   }
 ```
+
+### 打包库/Library
+```
+const path = require('path');
+module.exports = {
+	mode: 'production',
+	entry: './src/index.js',
+	externals: 'lodash',    //忽略lodash这个库
+	output: {
+		path: path.resolve(__dirname, 'dist'),
+		filename: 'library.js',
+		library: 'root',        //支持script引入
+		libraryTarget: 'umd'    //支持多种引入方式(Common/AMD/ES6)
+	}
+}
+
+```
+
+### PWA (progressive Web Application)渐进性网路应用
+1. 渐进式网络应用程序(progressive web application - PWA)，是一种可以提供类似于native app(原生应用程序) 体验的 web app(网络应用程序).PWA在离线(offline)时应用程序能够继续运行功能
+2. 使用workbox-webpack-plugin 插件
+```
+const path = require('path');
+  const HtmlWebpackPlugin = require('html-webpack-plugin');
+  const CleanWebpackPlugin = require('clean-webpack-plugin');
+  const WorkboxPlugin = require('workbox-webpack-plugin');
+
+  module.exports = {
+    entry: {
+      app: './src/index.js',
+      print: './src/print.js'
+    },
+    plugins: [
+      new CleanWebpackPlugin(['dist']),
+      
+     new WorkboxPlugin.GenerateSW({
+       // 这些选项帮助快速启用 ServiceWorkers
+       // 不允许遗留任何“旧的” ServiceWorkers
+       clientsClaim: true,
+       skipWaiting: true
+     })
+    ],
+    output: {
+      filename: '[name].bundle.js',
+      path: path.resolve(__dirname, 'dist')
+    }
+  };
+```
