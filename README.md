@@ -844,3 +844,9 @@ module.exports = {
 };
 
 ```
+
+### 提升webpack打包速度
+1. 跟上技术的迭代(Node,NPM,Yarn)
+2. 在尽可能少的模块上应用Loader
+3. Plugin尽可能精简并确保可靠
+4. resolve参数合理配置
