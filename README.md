@@ -902,3 +902,80 @@ const configs = {
 configs.plugins = makePlugins(configs);
 module.exports = configs
 ```
+
+
+
+### 编写一个loader
+1. 写一个新的函数,将获取到的数据通过函数转化为一个新的数据
+```
+<!-- 编写的loader -->
+const loaderUtils = require('loader-utils');    //loader-utils来分析loader的数据
+
+module.exports = function(source) {
+	return source.replace('hello', 'world');
+}
+
+<!-- webpack.config.js -->
+module.exports={
+  module: {
+		rules: [{
+			test: /\.js/,
+			use: [
+				{
+					loader: 'replaceLoader',
+				},
+			]
+		}]
+	},
+}
+```
+
+
+### 编写一个Plugin
+1. 设计模式类似事件驱动机制
+```
+class CopyrightWebpackPlugin {
+
+	apply(compiler) {   //compiler可以理解为webpack的实例,可以得到webpack的属性和方法
+  <!-- compiler.hooks钩子为每个时刻处理的东西 -->
+		compiler.hooks.compile.tap('CopyrightWebpackPlugin', (compilation) => {
+			console.log('compiler');
+		})
+    //compilation保存这次打包的内容
+    <!-- 在打包之前处理的函数 -->
+		compiler.hooks.emit.tapAsync('CopyrightWebpackPlugin', (compilation, cb) => {
+			debugger;
+			compilation.assets['copyright.txt']= {
+				source: function() {
+					return 'copyright by hello world'
+				},
+				size: function() {
+					return 21;
+				}
+			};
+			cb();
+		})
+	}
+}
+module.exports = CopyrightWebpackPlugin;
+
+
+<!-- webpack.config.js -->
+const path = require('path');
+const CopyRightWebpackPlugin = require('插件路径');
+
+module.exports = {
+	mode: 'development',
+	entry: {
+		main: './src/index.js'
+	},
+	plugins: [
+		new CopyRightWebpackPlugin()    //实例化就可以使用了
+	],
+	output: {
+		path: path.resolve(__dirname, 'dist'),
+		filename: '[name].js'
+	}
+}
+```
+
