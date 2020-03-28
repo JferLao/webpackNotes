@@ -850,3 +850,55 @@ module.exports = {
 2. 在尽可能少的模块上应用Loader
 3. Plugin尽可能精简并确保可靠
 4. resolve参数合理配置
+
+
+### 多页面打包配置
+```
+module.exports={
+  plugins: [
+        new HtmlWebpackPlugin({
+            template: 'src/index.html', //根据哪个文件为模板
+            filename:'index.html',    //打包后的名称
+            chunks:['runtime','vendors','main']   //引入的js文件有哪些
+        }),
+        new HtmlWebpackPlugin({
+            template: 'src/index.html', //根据哪个文件为模板
+            filename:'index.html',    //打包后的名称
+            chunks:['runtime','vendors','list']   //引入的js文件有哪些
+        }),
+    ],
+}
+```
+
+**自动化**
+```
+const makePlugins = (configs) => {
+	const plugins = [
+		new CleanWebpackPlugin(['dist'], {
+			root: path.resolve(__dirname, '../')
+		})
+	];
+	Object.keys(configs.entry).forEach(item => {    //遍历入口文件数目
+		plugins.push(
+			new HtmlWebpackPlugin({
+				template: 'src/index.html',
+				filename: `${item}.html`,
+				chunks: ['runtime', 'vendors', item]
+			})
+		)
+	});
+	return plugins;
+}
+const configs = {
+	entry: {
+		index: './src/index.js',
+		list: './src/list.js',
+		detail: './src/detail.js',
+	},
+	output: {
+		path: path.resolve(__dirname, '../dist')
+	}
+}
+configs.plugins = makePlugins(configs);
+module.exports = configs
+```
