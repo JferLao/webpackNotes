@@ -486,13 +486,13 @@ module.exports = {
               vendors: {
                   test: /[\\/]node_modules[\\/]/, //检测是否在node_modules文件夹内,符合的话会将代码分割到vendor~入口文件名字组
                   priority: -10, //打包优先级,越高优先打包在这
-                  fillname: 'vendors.js' //把文件名改成vendors.js
+                  filename: 'vendors.js' //把文件名改成vendors.js
               },
               default: { //默认放置的组名
                   minChunks: 2,
                   priority: -20,
                   reuseExistingChunk: true, //复用已经打包过的模块
-                  fillname: 'common.js'
+                  filename: 'common.js'
               }
           }
         }
